@@ -1,0 +1,113 @@
+import psycopg2
+
+# Connect to your PostgreSQL database
+conn = psycopg2.connect(
+    dbname="your_db_name",
+    user="your_username",
+    password="your_password",
+    host="your_host",
+    port="your_port"
+)
+
+# Create a cursor object to execute SQL commands
+cur = conn.cursor()
+
+# Create tables for students, faculty, program managers, departments, courses, timetable, and weekly timetable
+cur.execute("""
+CREATE TABLE IF NOT EXISTS students (
+    student_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(15),
+    cnic VARCHAR(13) NOT NULL UNIQUE,
+    current_semester INTEGER,
+    cgpa NUMERIC(3, 2),
+    father_name VARCHAR(100),
+    program_type VARCHAR(20),
+    program VARCHAR(50),
+    last_institute VARCHAR(100),
+    last_grade VARCHAR(10),
+    department_id INTEGER REFERENCES departments(department_id)
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS faculty (
+    faculty_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(15),
+    cnic VARCHAR(13) NOT NULL UNIQUE,
+    qualifications TEXT[],
+    last_institute VARCHAR(100),
+    experience_years INTEGER,
+    department_id INTEGER REFERENCES departments(department_id)
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS program_managers (
+    manager_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(15),
+    cnic VARCHAR(13) NOT NULL UNIQUE,
+    department_id INTEGER REFERENCES departments(department_id)
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS departments (
+    department_id SERIAL PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS courses (
+    course_id SERIAL PRIMARY KEY,
+    course_name VARCHAR(100) NOT NULL,
+    department_id INTEGER REFERENCES departments(department_id),
+    timings VARCHAR(100)
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS timetable (
+    timetable_id SERIAL PRIMARY KEY,
+    course_id INTEGER REFERENCES courses(course_id),
+    faculty_id INTEGER REFERENCES faculty(faculty_id),
+    day_of_week VARCHAR(10),
+    start_time TIME,
+    end_time TIME,
+    classroom VARCHAR(50)
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS weekly_timetable (
+    weekly_timetable_id SERIAL PRIMARY KEY,
+    week_number INTEGER,
+    course_id INTEGER REFERENCES courses(course_id),
+    faculty_id INTEGER REFERENCES faculty(faculty_id),
+    day_of_week VARCHAR(10),
+    start_time TIME,
+    end_time TIME,
+    classroom VARCHAR(50)
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS student_courses (
+    student_id INTEGER REFERENCES students(student_id),
+    course_id INTEGER REFERENCES courses(course_id),
+    PRIMARY KEY (student_id, course_id)
+)
+""")
+
+# Commit the changes
+conn.commit()
+
+# Close cursor and connection
+cur.close()
+conn.close()

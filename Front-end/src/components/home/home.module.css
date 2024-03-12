@@ -1,0 +1,18 @@
+.text-2xl {
+    font-size: 2rem;
+  }
+  
+  .font-bold {
+    font-weight: bold;
+  }
+  
+  .pt-14 {
+    padding-top: 3.5rem; /* Adjust as needed */
+  }
+  
+  body {
+    background-image: url('https://szabist-isb.edu.pk/wp-content/uploads/2020/05/356A7777-3.jpg'); /* Replace 'your-background-image-url.jpg' with the URL of your background image */
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
